@@ -1,0 +1,9 @@
+ofxGui
+ofxKinect
+ofxOpenCv
+ofxOsc
+ofxXmlSettings
+ofxGLWarper
+ofxPS3EyeGrabber
+ofxSceneManager
+ofxSyphon
