@@ -95,9 +95,9 @@ void ofApp::mouseReleased(int x, int y, int button)
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h)
 {
-    isoplane.makeOrtho();
-    isoplane.makeIsoToScreen();
-    isoplane.makeCorner();
+    isoplane.updateOrtho();
+    isoplane.updateIsoToScreen();
+    isoplane.updateCorner();
 }
 
 //--------------------------------------------------------------

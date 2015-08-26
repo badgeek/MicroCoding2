@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3548B59F722E4D1B99C94832 /* microinspectormanager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D01DB3534B894F0EB4427759 /* microinspectormanager.cpp */; };
+		5E5A9B0AC27A4EE183176703 /* microinspector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 10CD4D38E86E47AFBBFFCB9A /* microinspector.cpp */; };
 		0546D1A38E13BD319CC9755B /* OscReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9BF3AA0D4FAA89D0F8A0E545 /* OscReceivedElements.cpp */; };
 		09EE94AD9ABEC70041CA97AA /* ps3eye.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 032D21410D0B3185CB33ED3F /* ps3eye.cpp */; };
 		0F8F016776681D468C0D0949 /* audio.c in Sources */ = {isa = PBXBuildFile; fileRef = 34FC4C582EA5ED68F36013CD /* audio.c */; };
@@ -123,6 +125,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D01DB3534B894F0EB4427759 /* microinspectormanager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = microinspectormanager.cpp; path = microinspectormanager.cpp; sourceTree = "<group>"; };
+		37D77D92BAA44CE5BCDC5020 /* microinspectormanager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = microinspectormanager.h; path = microinspectormanager.h; sourceTree = "<group>"; };
+		10CD4D38E86E47AFBBFFCB9A /* microinspector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = microinspector.cpp; path = microinspector.cpp; sourceTree = "<group>"; };
+		D8A855D5DB3247A59F45F5E0 /* microinspector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = microinspector.h; path = microinspector.h; sourceTree = "<group>"; };
 		00D6D32B84B099226431108C /* ofxOsc.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxOsc.h; path = ../../../addons/ofxOsc/src/ofxOsc.h; sourceTree = SOURCE_ROOT; };
 		011E372AEA4DFBC1A32C2851 /* all_indices.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = all_indices.h; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/all_indices.h; sourceTree = SOURCE_ROOT; };
 		01438542609FC64F1EC60EEB /* ofxKinectExtras.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxKinectExtras.cpp; path = ../../../addons/ofxKinect/src/extra/ofxKinectExtras.cpp; sourceTree = SOURCE_ROOT; };
@@ -1077,7 +1083,11 @@
 				9C09A6B93607432A8B4DE0EF /* eyeMesh.cpp */,
 				9262805F8A794E09BB135A67 /* isometricplane.cpp */,
 				ABBAC788020A4892BA4BE766 /* isometricplane.h */,
-			);
+			    D8A855D5DB3247A59F45F5E0 /* microinspector.h */,
+    10CD4D38E86E47AFBBFFCB9A /* microinspector.cpp */,
+    37D77D92BAA44CE5BCDC5020 /* microinspectormanager.h */,
+    D01DB3534B894F0EB4427759 /* microinspectormanager.cpp */,
+);
 			path = src;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -1328,7 +1338,9 @@
 				466E5D60508B44C69CC84249 /* eyeMesh.cpp in Sources */,
 				89333C771B8C5BE500111AD7 /* ofxLabel.cpp in Sources */,
 				73A17F01094548BCBA7395C8 /* isometricplane.cpp in Sources */,
-			);
+			    5E5A9B0AC27A4EE183176703 /* microinspector.cpp in Sources */,
+    3548B59F722E4D1B99C94832 /* microinspectormanager.cpp in Sources */,
+);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */

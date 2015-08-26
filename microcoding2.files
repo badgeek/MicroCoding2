@@ -6,3 +6,7 @@ src/eyeMesh.h
 addons.make
 src/isometricplane.h
 src/isometricplane.cpp
+src/microinspectormanager.h
+src/microinspectormanager.cpp
+src/microinspector.h
+src/microinspector.cpp

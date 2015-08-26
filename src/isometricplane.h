@@ -9,14 +9,28 @@ class isoMetricPlane
 {
 public:
     isoMetricPlane();
+    ~isoMetricPlane();
     void setup();
     void update();
     void draw();
-    void makeOrtho();
-    void makeIsoToScreen();
-    void makeCorner();
-    ofPoint getWorldToScreenPos(const ofVec4f &_srcpos);
-    ofPoint getWorldToScreenPos(const ofPoint &_srcpos);
+
+    void updateOrtho();
+    void updateIsoToScreen();
+    void updateCorner();
+    void updateScreenToSourceCoord();
+
+    ofPoint getIsoToScreenCoord(const ofVec4f &_srcpos);
+    ofPoint getIsoToScreenCoord(const ofPoint &_srcpos);
+    ofPoint getScreenToSourceCoord(const ofPoint &_srcpos);
+
+    void enableMouseEvents();
+    void disableMouseEvents();
+    void _mouseMoved(ofMouseEventArgs &e);
+    void _mousePressed(ofMouseEventArgs &e);
+    void _mouseDragged(ofMouseEventArgs &e);
+    void _mouseReleased(ofMouseEventArgs &e);
+
+
 private:
     ofxGLWarper warp;
     eyeMesh mesh;
@@ -25,7 +39,10 @@ private:
     ofMatrix4x4 matprojortho;
     ofMatrix4x4 matmv;
     ofMatrix4x4 matworldtoiso;
+
     ofVec4f mousepos;
+    ofVec4f mousepos_src;
+
     float isoGridWidth;
     float scaleProportion;
 
