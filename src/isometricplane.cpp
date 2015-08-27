@@ -20,10 +20,11 @@ isoMetricPlane::isoMetricPlane()
 
 isoMetricPlane::~isoMetricPlane() {
     disableMouseEvents();
+    disableKeyboardEvents();
 }
 //--------------------------------------------------------------
 
-void isoMetricPlane::setup()
+void isoMetricPlane::setup(ofVideoGrabber *_video)
 {
     mesh.setMeshGrid(150,150);
     mesh.setMeshSize(0.0066,0.0066);
@@ -31,22 +32,40 @@ void isoMetricPlane::setup()
     mesh.updateMeshVerCoord();
     mesh.updateDisplayList();
 
+    isoPlaneRect.set(0,0,1000,750);
+
+    _isoPlaneWidth = isoPlaneRect.getWidth();
+    _isoPlaneHeight = isoPlaneRect.getHeight();
+    _isoPlaneCenterX = isoPlaneRect.getCenter().x;
+    _isoPlaneCenterY = isoPlaneRect.getCenter().y;
+
+
     isoGridWidth = 500;
 
-    corner[0].set(-isoGridWidth, -isoGridWidth,0,1);
-    corner[1].set(-isoGridWidth, isoGridWidth,0,1);
-    corner[2].set(isoGridWidth, isoGridWidth,0,1);
-    corner[3].set(isoGridWidth, -isoGridWidth,0,1);
+    corner[0].set(-_isoPlaneCenterX, -_isoPlaneCenterY,0,1);
+    corner[1].set(-_isoPlaneCenterX, _isoPlaneCenterY,0,1);
+    corner[2].set(_isoPlaneCenterX, _isoPlaneCenterY,0,1);
+    corner[3].set(_isoPlaneCenterX, -_isoPlaneCenterY,0,1);
 
-    warp.setup(1000,1000); //isometric area - fromScreenToWarpCoord
+    warp.setup(_isoPlaneWidth,_isoPlaneHeight); //isometric area - fromScreenToWarpCoord
 
-    warp.toogleActive();
+//    warp.toogleActive();
+//    warp.deactivate();
 
     updateOrtho();
     updateIsoToScreen();
     updateCorner();
 
     enableMouseEvents();
+    enableKeyboardEvents();
+
+    webcam = _video;
+    shader.load("shaders/fuxShader");
+
+    imgCroppedVideo.allocate(100,100, OF_IMAGE_COLOR_ALPHA);
+
+    microManager.setup(&mousepos_src);
+
 }
 //--------------------------------------------------------------
 
@@ -54,6 +73,14 @@ void isoMetricPlane::update()
 {
     //mousepos.set(    (float)  ofGetMouseX() - (float) ofGetWidth()/2.0f ,(float)  ofGetMouseY() -(float)  ofGetHeight()/2.0f, 0, 1);
     updateScreenToSourceCoord();
+
+    if (webcam->isFrameNew())
+    {
+        imgSourceVideo.setFromPixels(webcam->getPixelsRef());
+        imgCroppedVideo.cropFrom(imgSourceVideo,100,100,100,100);
+      //  imgCroppedVideo.setImageType(OF_IMAGE_GRAYSCALE);
+    }
+
 }
 //--------------------------------------------------------------
 
@@ -76,34 +103,46 @@ void isoMetricPlane::draw()
 
             glPushMatrix(); //2
 
-            //screen coord to isometric coord
-            float _posxx = mousepos_src.x - 500;
-            float _posyy = (mousepos_src.y - 500) * -1.0f;
+            //screen coord to isometric coord on screen
+            float _posxx = mousepos_src.x - _isoPlaneCenterX;
+            float _posyy = (mousepos_src.y - _isoPlaneCenterY) * -1.0f;
 
-//            ofLine(-500, _posyy, 500, _posyy);
-//                    ofLine(_posxx, -500, _posxx, 500);
-//            ofCircle(_posxx,_posyy, 20);
+
+
+            ofLine(-2000, _posyy, 2000, _posyy);
+            ofLine(_posxx, -2000, _posxx, 2000);
+            ofCircle(_posxx,_posyy, 20);
 
                 ofPushMatrix();
                     ofNoFill();
                     ofCircle(0,0,ofGetWidth());
                 ofPopMatrix();
 
-                ofPushMatrix();
-                    glScalef(1,1,-1);
-                    ofTranslate(_posxx,_posyy);
-                    ofDrawAxis(100);
-                ofPopMatrix();
+//                ofPushMatrix();
+//                    glScalef(1,1,-1);
+//                    ofTranslate(_posxx,_posyy);
+//                    ofDrawAxis(100);
+//                ofPopMatrix();
+
+//                ofPushStyle();
+//                    ofSetColor(0,255,0);
+//                    ofCircle(corner[0], 5);
+//                    ofCircle(corner[1], 10);
+//                    ofCircle(corner[2], 15);
+//                    ofCircle(corner[3], 20);
+//                ofPopStyle();
+
+//                ofDrawGrid(isoGridWidth,5.0f,false,false,false,true);
 
                 ofPushStyle();
-                    ofSetColor(0,255,0);
-                    ofCircle(corner[0], 5);
-                    ofCircle(corner[1], 10);
-                    ofCircle(corner[2], 15);
-                    ofCircle(corner[3], 20);
+                ofColor c;
+                c.set(50);
+                ofSetColor(c);
+                ofPushMatrix();
+                ofRotate(90, 0, 1, 0);
+                ofDrawGridPlane(isoGridWidth, 5.0f, false);
+                ofPopMatrix();
                 ofPopStyle();
-
-                ofDrawGrid(isoGridWidth,5.0f,false,false,false,true);
 
                 glPushMatrix();
                     glTranslatef(1*mousepos.x, 1*mousepos.y,0);
@@ -112,6 +151,45 @@ void isoMetricPlane::draw()
                     ofCircle(0,0,5);
                     ofPopStyle();
                 glPopMatrix();
+
+
+
+                shader.begin();
+                shader.setUniform1f("eyeMultiply", 200.0f);
+                shader.setUniformTexture("eyeTexDepth", webcam->getTextureReference(),0);
+                ofPushMatrix(); //visual
+                    ofScale(1,-1,1);
+                  //  ofRotateZ(180);
+
+                                    glPushMatrix();
+                                        glTranslatef(_isoPlaneCenterX,_isoPlaneCenterY,0);
+                                        glPushMatrix();
+                                            glScalef(_isoPlaneWidth,_isoPlaneHeight,-1);
+                                            glPushAttrib(GL_POLYGON_BIT);
+                                            glFrontFace(GL_CW);
+                                            glPointSize(2.5f);
+                                            mesh.drawDisplayList(GL_POINTS);
+                                            glPopAttrib();
+                                        glPopMatrix();
+                                        glPushMatrix();
+                                            glScalef(_isoPlaneWidth,_isoPlaneHeight,-1);
+                                            glPushAttrib(GL_POLYGON_BIT);
+                                                glFrontFace(GL_CW);
+                                                glPolygonMode(GL_FRONT, GL_LINE);
+                                                glPolygonMode(GL_BACK, GL_LINE);
+                                                mesh.drawDisplayList(GL_LINES);
+                                            glPopAttrib();
+                                        glPopMatrix();
+                                    glPopMatrix();
+
+                ofPopMatrix(); //visual
+                shader.end();
+
+                ofPushMatrix();
+                    ofScale(1,1,-1);
+                    microManager.draw();
+                ofPopMatrix();
+
 
             glPopMatrix(); //2
         glPopMatrix(); //1
@@ -122,26 +200,38 @@ void isoMetricPlane::draw()
         glMatrixMode(GL_MODELVIEW);
 
 
-            ofPoint test1 = getIsoToScreenCoord(corner[0]);
-            ofPoint test2 = getIsoToScreenCoord(corner[1]);
-            ofPoint test3 = getIsoToScreenCoord(corner[2]);
-            ofPoint test4 = getIsoToScreenCoord(corner[3]);
+//            ofPoint test1 = getIsoToScreenCoord(corner[0]);
+//            ofPoint test2 = getIsoToScreenCoord(corner[1]);
+//            ofPoint test3 = getIsoToScreenCoord(corner[2]);
+//            ofPoint test4 = getIsoToScreenCoord(corner[3]);
 
-            ofCircle(test1.x, test1.y, 10);
-            ofCircle(test2.x, test2.y, 20);
-            ofCircle(test3.x, test3.y, 30);
-            ofCircle(test4.x, test4.y, 40);
+//            ofCircle(test1.x, test1.y, 10);
+//            ofCircle(test2.x, test2.y, 20);
+//            ofCircle(test3.x, test3.y, 30);
+//            ofCircle(test4.x, test4.y, 40);
 
 
-            ofRect(ofGetWidth()/2  - 500 , ofGetHeight()/2 - 500, 1000,1000);
+//            imgSourceVideo.draw(0,0);
+//            imgCroppedVideo.draw(640,0);
 
-            float _posx = mousepos_src.x;
-            float _posy = mousepos_src.y;
+         //   ofRect(ofGetWidth()/2  - 500 , ofGetHeight()/2 - 500, 1000,1000);
 
-            ofCircle((float)ofGetWidth()/2.0f - 500.0f + _posx, ((float)ofGetHeight()-1000)/2 +  _posy ,30);
+//            float _posx = mousepos_src.x - _isoPlaneCenterX;
+//            float _posy = (mousepos_src.y - _isoPlaneCenterY) * -1;
 
-            ofDrawBitmapString(ofToString(_posx-500) + " " + ofToString((_posy-500)*-1), ofGetMouseX(), ofGetMouseY(), 1);
+          //  ofCircle(mousepos_src, 10);
 
+            //ofCircle((float)ofGetWidth()/2.0f - 500.0f + mousepos_src.x, ((float)ofGetHeight()-1000)/2 +  mousepos_src.y ,30);
+
+//            ofDrawBitmapString(ofToString(_posx) + " " + ofToString((_posy*-1)), ofGetMouseX(), ofGetMouseY(), 1);
+
+
+//            ofDrawBitmapString(ofToString(_posx) + " " + ofToString(_posy), ofGetMouseX(), ofGetMouseY(), 1);
+            ofDrawBitmapString(ofToString(mousepos_src.x) + " " + ofToString(mousepos_src.y), ofGetMouseX(), ofGetMouseY(), 1);
+
+            //ofCircle(mousepos_src.x, mousepos_src.y, 10);
+
+            //   _inspector.setPos(_posxx, _posyy);
 }
 //--------------------------------------------------------------
 
@@ -224,6 +314,18 @@ void isoMetricPlane::disableMouseEvents() {
     ofRemoveListener(ofEvents().mouseReleased, this, &isoMetricPlane::_mouseReleased);
 }
 
+void isoMetricPlane::enableKeyboardEvents()
+{
+    ofAddListener(ofEvents().keyPressed, this, &isoMetricPlane::_keyPressed);
+    ofAddListener(ofEvents().keyReleased, this, &isoMetricPlane::_keyReleased);
+}
+
+void isoMetricPlane::disableKeyboardEvents()
+{
+    ofRemoveListener(ofEvents().keyPressed, this, &isoMetricPlane::_keyPressed);
+    ofRemoveListener(ofEvents().keyReleased, this, &isoMetricPlane::_keyReleased);
+}
+
 
 //--------------------------------------------------------------
 void isoMetricPlane::_mouseMoved(ofMouseEventArgs &e) {
@@ -247,4 +349,26 @@ void isoMetricPlane::_mouseReleased(ofMouseEventArgs &e) {
 }
 
 
+//--------------------------------------------------------------
+void isoMetricPlane::_keyPressed(ofKeyEventArgs &e) {
+    int key = e.key;
+    microInspector _ins;
+
+//    float _posxx = mousepos_src.x - _isoPlaneCenterX;
+//    float _posyy = (mousepos_src.y - _isoPlaneCenterY) * -1.0f;
+//    ofLog() << "posx " << ofToString(_posxx)  << "posy " << ofToString(_posyy);
+
+    _ins.setup(&imgSourceVideo, &isoPlaneRect);
+    _ins.setPos(mousepos_src.x, mousepos_src.y);
+
+//    _ins.setPos(_posxx, _posyy);
+
+    if (key == 'a') microManager.inspectors.push_back(_ins);
+}
+
+//--------------------------------------------------------------
+void isoMetricPlane::_keyReleased(ofKeyEventArgs &e) {
+
+
+}
 

@@ -25,8 +25,8 @@ class ofApp : public ofBaseApp{
 
 private:
         ofVideoGrabber vidGrabber;
+        ofVideoGrabber * wew;
         ofTexture ps3;
-        ofShader shader;
         isoMetricPlane isoplane;
         ofEasyCam camera;
 };
