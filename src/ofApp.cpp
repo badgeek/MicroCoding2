@@ -25,6 +25,10 @@ void ofApp::setup()
 
     isoplane.setup( &vidGrabber);
 
+    ofHideCursor();
+    
+    mClient.setup();
+    mClient.set("","Syphoner Demo");
 
 
 }
@@ -41,6 +45,8 @@ void ofApp::draw()
 {
     ofBackground(0);
     isoplane.draw();
+
+mClient.draw(50, 50);
     // camera.begin();
 
 }

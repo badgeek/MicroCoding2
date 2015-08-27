@@ -14,7 +14,7 @@
 isoMetricPlane::isoMetricPlane()
 {
 
-
+    scene = 0;
 }
 //--------------------------------------------------------------
 
@@ -66,6 +66,12 @@ void isoMetricPlane::setup(ofVideoGrabber *_video)
 
     microManager.setup(&mousepos_src);
 
+//    buffFbo.allocate(1024, 768, GL_RGBA);
+
+//    buffFbo.begin();
+//    ofClear(0);
+//    buffFbo.end();
+
 }
 //--------------------------------------------------------------
 
@@ -86,9 +92,42 @@ void isoMetricPlane::update()
 }
 //--------------------------------------------------------------
 
-void isoMetricPlane::draw()
+void isoMetricPlane::drawDepthMap()
 {
+    shader.begin();
+    shader.setUniform1f("eyeMultiply", 200.0f);
+    shader.setUniformTexture("eyeTexDepth", webcam->getTextureReference(),0);
+    ofPushMatrix(); //visual
+        ofScale(1,1,1);
+      //  ofRotateZ(180);
 
+                        glPushMatrix();
+                            glTranslatef(_isoPlaneCenterX,_isoPlaneCenterY,0);
+                            glPushMatrix();
+                                glScalef(_isoPlaneWidth,_isoPlaneHeight,-1);
+                                glPushAttrib(GL_POLYGON_BIT);
+                                glFrontFace(GL_CW);
+                                glPointSize(2.5f);
+                                mesh.drawDisplayList(GL_POINTS);
+                                glPopAttrib();
+                            glPopMatrix();
+                            glPushMatrix();
+                                glScalef(_isoPlaneWidth,_isoPlaneHeight,-1);
+                                glPushAttrib(GL_POLYGON_BIT);
+                                    glFrontFace(GL_CW);
+                                    glPolygonMode(GL_FRONT, GL_LINE);
+                                    glPolygonMode(GL_BACK, GL_LINE);
+                                    mesh.drawDisplayList(GL_LINES);
+                                glPopAttrib();
+                            glPopMatrix();
+                        glPopMatrix();
+
+    ofPopMatrix(); //visual
+    shader.end();
+}
+
+void isoMetricPlane::drawIsoMetric()
+{
     glGetFloatv(GL_PROJECTION_MATRIX, matproj.getPtr());
 
     glMatrixMode(GL_PROJECTION);
@@ -154,43 +193,13 @@ void isoMetricPlane::draw()
                     ofPopStyle();
                 glPopMatrix();
 
-
-
-//                shader.begin();
-//                shader.setUniform1f("eyeMultiply", 200.0f);
-//                shader.setUniformTexture("eyeTexDepth", webcam->getTextureReference(),0);
-//                ofPushMatrix(); //visual
-//                    ofScale(1,-1,1);
-//                  //  ofRotateZ(180);
-
-//                                    glPushMatrix();
-//                                        glTranslatef(_isoPlaneCenterX,_isoPlaneCenterY,0);
-//                                        glPushMatrix();
-//                                            glScalef(_isoPlaneWidth,_isoPlaneHeight,-1);
-//                                            glPushAttrib(GL_POLYGON_BIT);
-//                                            glFrontFace(GL_CW);
-//                                            glPointSize(2.5f);
-//                                            mesh.drawDisplayList(GL_POINTS);
-//                                            glPopAttrib();
-//                                        glPopMatrix();
-//                                        glPushMatrix();
-//                                            glScalef(_isoPlaneWidth,_isoPlaneHeight,-1);
-//                                            glPushAttrib(GL_POLYGON_BIT);
-//                                                glFrontFace(GL_CW);
-//                                                glPolygonMode(GL_FRONT, GL_LINE);
-//                                                glPolygonMode(GL_BACK, GL_LINE);
-//                                                mesh.drawDisplayList(GL_LINES);
-//                                            glPopAttrib();
-//                                        glPopMatrix();
-//                                    glPopMatrix();
-
-//                ofPopMatrix(); //visual
-//                shader.end();
+                //gpufux
+                drawDepthMap();
 
                 ofPushMatrix();
                     ofScale(1,1,-1);
                     microManager.draw();
-                    imgSourceVideo.draw(-500,-375, 1000, 750);
+                    //imgSourceVideo.draw(-500,-375, 1000, 750);
                 ofPopMatrix();
 
 
@@ -231,7 +240,48 @@ void isoMetricPlane::draw()
 
 //            ofDrawBitmapString(ofToString(_posx) + " " + ofToString(_posy), ofGetMouseX(), ofGetMouseY(), 1);
             ofDrawBitmapString(ofToString(mousepos_src.x) + " " + ofToString(mousepos_src.y), ofGetMouseX(), ofGetMouseY(), 1);
+}
 
+void isoMetricPlane::drawDeptMapCamera()
+{
+
+
+    camera.begin();
+    drawDepthMap();
+    camera.end();
+
+
+//    buffFbo.begin();
+//    ofClear(0);
+//    drawIsoMetric();
+//    buffFbo.end();
+
+//    buffFbo.draw(0,0);
+
+    ofPushStyle();
+    ofNoFill();
+    ofCircle(ofGetMouseX(), ofGetMouseY(), 10);
+    ofPopStyle();
+
+}
+
+void isoMetricPlane::draw()
+{
+    switch (scene) {
+    case 0:
+        drawIsoMetric();
+        break;
+    case 1:
+        drawDeptMapCamera();
+        break;
+    }
+
+    if(scene == 1)
+    {
+        camera.enableMouseInput();
+    }else{
+        camera.disableMouseInput();
+    }
             //ofCircle(mousepos_src.x, mousepos_src.y, 10);
 
             //   _inspector.setPos(_posxx, _posyy);
@@ -367,6 +417,9 @@ void isoMetricPlane::_keyPressed(ofKeyEventArgs &e) {
 //    _ins.setPos(_posxx, _posyy);
 
     if (key == 'a') microManager.inspectors.push_back(_ins);
+    if (key == 'z') scene = 0;
+    if (key == 'x') scene = 1;
+
 }
 
 //--------------------------------------------------------------

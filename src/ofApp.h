@@ -4,6 +4,8 @@
 //#include "ofxOsc.h"
 #include "isometricplane.h"
 #include "ofxGui.h"
+#include "ofxSyphon.h"
+
 class ofApp : public ofBaseApp{
 
 	public:
@@ -28,5 +30,5 @@ private:
         ofVideoGrabber * wew;
         ofTexture ps3;
         isoMetricPlane isoplane;
-        ofEasyCam camera;
+    ofxSyphonClient mClient;
 };

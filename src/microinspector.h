@@ -11,7 +11,8 @@ public:
     void setPos(float _x, float _y);
     void setup(ofImage * _video, ofRectangle * _isoRect);
     void update();
-
+    void grabFrame();
+    void diffFrame();
 
     float getScreenPosX();
     float getScreenPosY();
@@ -38,6 +39,10 @@ private:
     ofRectangle *rectIsoPlane;
     ofRectangle rectScreenCoord;
     ofRectangle rectSourceCoord;
+
+    unsigned char savedVideo[1440000];
+    float differenceVideo;
+    float differenceVideo2;
 
     float width;
     float height;

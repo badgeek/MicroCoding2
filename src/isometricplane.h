@@ -42,6 +42,9 @@ public:
     void _keyPressed(ofKeyEventArgs &e);
     void _keyReleased(ofKeyEventArgs &e);
 
+    void drawDepthMap();
+    void drawIsoMetric();
+    void drawDeptMapCamera();
 private:
     ofxGLWarper warp;
     eyeMesh mesh;
@@ -69,6 +72,8 @@ private:
 
     microInspectorManager microManager;
 
+    ofEasyCam camera;
+
     //webcam
     ofVideoGrabber * webcam;
     ofImage imgSourceVideo;
@@ -76,6 +81,9 @@ private:
 
     //effects
     ofShader shader;
+    ofFbo buffFbo;
+
+    int scene;
 
 };
 

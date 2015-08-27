@@ -22,7 +22,12 @@ void microInspector::draw()
 
     ofPushMatrix();
         ofPushStyle();
-            ofSetColor(0,255,0);
+            if (differenceVideo > 2.0)
+            {
+                ofSetColor(255,0,0);
+            }else{
+                ofSetColor(0,255,0);
+            }
             ofTranslate(0,0,10);
             ofRect(rectScreenCoord);
             //ofCircle(rectScreenCoord.getTopLeft().x, rectScreenCoord.getTopLeft().y, 10);
@@ -34,7 +39,7 @@ void microInspector::draw()
     ofPushMatrix();
         ofPushMatrix();
             ofTranslate(rectScreenCoord.getCenter().x, rectScreenCoord.getCenter().y,40);
-            croppedVideo.draw(0,0);
+            //croppedVideo.draw(0,0);
 //            sourceVideo->draw(0,0);
     //   // ofCircle(0,0,10);
             ofPushMatrix();
@@ -97,7 +102,15 @@ void microInspector::update()
 //    {
 //        ofLog() << "Crop";
         croppedVideo.cropFrom(*sourceVideo,_posxclamp,_posyclamp,width,height);
+        croppedVideo.setImageType(OF_IMAGE_GRAYSCALE);
+
+
+
 //    }
+
+        diffFrame();
+
+        ofLog() << differenceVideo;
 }
 
 float microInspector::getScreenPosX()
@@ -110,6 +123,46 @@ float microInspector::getScreenPosY()
     return  (posx - _isoPlaneCenterY) * -1.0f;
 }
 
+
+void microInspector::grabFrame()
+{
+
+    int crop_width = width;
+    int crop_height = height;
+
+    int channel_crop = croppedVideo.getPixelsRef().getBytesPerPixel();
+    unsigned char *pix = croppedVideo.getPixels();
+
+    for (int x = 0 ; x < crop_width * crop_height * channel_crop; x++)
+    {
+        savedVideo[x] = pix[x];
+    }
+
+}
+
+void microInspector::diffFrame()
+{
+    float crop_width = width;
+    float crop_height = height;
+
+    float channel_crop = croppedVideo.getPixelsRef().getBytesPerPixel();
+
+    unsigned char *pix = croppedVideo.getPixels();
+
+    float diff;
+    float diff2;
+
+    for (int x = 0 ; x < crop_width * crop_height * channel_crop; x++)
+    {
+        diff = diff + (abs(savedVideo[x] - pix[x]));
+        diff2 = diff2 + ((savedVideo[x] - pix[x]));
+    }
+
+    differenceVideo = diff/(crop_width * crop_height * channel_crop);
+    differenceVideo2 = diff2/(crop_width * crop_height * channel_crop);
+}
+
+//--------------------------------------------------------------
 
 bool microInspector::hitTest(float tx, float ty) const {
     return ((tx > posx) && (tx < posx + width) && (ty > posy) && (ty < posy + height));
@@ -140,6 +193,7 @@ void microInspector::_mouseMoved(float x, float y, int button)
 
     _stateChangeTimestampMillis = ofGetElapsedTimeMillis();
 }
+
 //--------------------------------------------------------------
 
 void microInspector::_mousePressed(float x, float y, int button)
@@ -199,7 +253,9 @@ void microInspector::_mouseReleased(float x, float y, int button)
 
 //--------------------------------------------------------------
 
-
+//--------------------------------------------------------------
+// msa interactive object
+//--------------------------------------------------------------
 
 void microInspector::onRollOver(float x, float y) {
 
@@ -240,7 +296,15 @@ void microInspector::onPressOutside(float x, float y, int button)
 void microInspector::onRelease(float x, float y, int button)
 {
     ofLog() << "onRelease inside";
+
+    if (dragging)
+    {
+        grabFrame();
+        ofLog() << "Dropped";
+    }
+
     dragging = false;
+
     // called when mouse releases while over object
 }
 
