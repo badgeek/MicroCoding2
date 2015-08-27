@@ -14,6 +14,7 @@ void microInspectorManager::setup(ofVec4f * _mousesrc)
 {
     mouse_src = _mousesrc;
 }
+//--------------------------------------------------------------
 
 void microInspectorManager::draw()
 {
@@ -22,6 +23,14 @@ void microInspectorManager::draw()
     }
 }
 
+//--------------------------------------------------------------
+
+void microInspectorManager::update()
+{
+    for(vector<microInspector>::iterator it = inspectors.begin(); it != inspectors.end(); it++){
+        (*it).update();
+    }
+}
 
 //--------------------------------------------------------------
 void microInspectorManager::_mouseMoved(ofMouseEventArgs &e) {

@@ -11,6 +11,9 @@ microInspector::microInspector()
 
     enabled = true;
     dragging = false;
+
+    croppedVideo.allocate(width,height, OF_IMAGE_COLOR_ALPHA);
+
 }
 //--------------------------------------------------------------
 
@@ -31,6 +34,8 @@ void microInspector::draw()
     ofPushMatrix();
         ofPushMatrix();
             ofTranslate(rectScreenCoord.getCenter().x, rectScreenCoord.getCenter().y,40);
+            croppedVideo.draw(0,0);
+//            sourceVideo->draw(0,0);
     //   // ofCircle(0,0,10);
             ofPushMatrix();
                 ofRotateX(-90);
@@ -77,6 +82,22 @@ void microInspector::setup(ofImage * _video, ofRectangle * _isoRect)
 void microInspector::update()
 {
 
+    float posxnorm = ((posx/rectIsoPlane->getWidth()) * sourceVideo->getWidth()) - width/2;
+    float posynorm = ((posy/rectIsoPlane->getHeight()) * sourceVideo->getHeight()) - height/2;
+
+    float _posxclamp = ofClamp(posxnorm, 0, sourceVideo->getWidth() - width);
+    float _posyclamp = ofClamp(posynorm, 0, sourceVideo->getHeight() - height);
+
+//    ofLog() << "posxnorm " << posxnorm << " posynorm" << posynorm;
+
+//    ofLog() << "_posxclamp " << _posxclamp << " _posyclamp" << _posyclamp;
+    //    ofLog() << "posx " << posx << " posy" << posy;
+
+//    if (posx < width-posx && posy < height-posy)
+//    {
+//        ofLog() << "Crop";
+        croppedVideo.cropFrom(*sourceVideo,_posxclamp,_posyclamp,width,height);
+//    }
 }
 
 float microInspector::getScreenPosX()

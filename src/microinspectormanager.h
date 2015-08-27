@@ -21,6 +21,8 @@ public:
     void setup(ofVec4f * _mousesrc);
 
     void draw();
+    void update();
+
     vector<microInspector> inspectors;
 
     ofVec4f *mouse_src;

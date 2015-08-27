@@ -81,6 +81,8 @@ void isoMetricPlane::update()
       //  imgCroppedVideo.setImageType(OF_IMAGE_GRAYSCALE);
     }
 
+    microManager.update();
+
 }
 //--------------------------------------------------------------
 
@@ -154,40 +156,41 @@ void isoMetricPlane::draw()
 
 
 
-                shader.begin();
-                shader.setUniform1f("eyeMultiply", 200.0f);
-                shader.setUniformTexture("eyeTexDepth", webcam->getTextureReference(),0);
-                ofPushMatrix(); //visual
-                    ofScale(1,-1,1);
-                  //  ofRotateZ(180);
+//                shader.begin();
+//                shader.setUniform1f("eyeMultiply", 200.0f);
+//                shader.setUniformTexture("eyeTexDepth", webcam->getTextureReference(),0);
+//                ofPushMatrix(); //visual
+//                    ofScale(1,-1,1);
+//                  //  ofRotateZ(180);
 
-                                    glPushMatrix();
-                                        glTranslatef(_isoPlaneCenterX,_isoPlaneCenterY,0);
-                                        glPushMatrix();
-                                            glScalef(_isoPlaneWidth,_isoPlaneHeight,-1);
-                                            glPushAttrib(GL_POLYGON_BIT);
-                                            glFrontFace(GL_CW);
-                                            glPointSize(2.5f);
-                                            mesh.drawDisplayList(GL_POINTS);
-                                            glPopAttrib();
-                                        glPopMatrix();
-                                        glPushMatrix();
-                                            glScalef(_isoPlaneWidth,_isoPlaneHeight,-1);
-                                            glPushAttrib(GL_POLYGON_BIT);
-                                                glFrontFace(GL_CW);
-                                                glPolygonMode(GL_FRONT, GL_LINE);
-                                                glPolygonMode(GL_BACK, GL_LINE);
-                                                mesh.drawDisplayList(GL_LINES);
-                                            glPopAttrib();
-                                        glPopMatrix();
-                                    glPopMatrix();
+//                                    glPushMatrix();
+//                                        glTranslatef(_isoPlaneCenterX,_isoPlaneCenterY,0);
+//                                        glPushMatrix();
+//                                            glScalef(_isoPlaneWidth,_isoPlaneHeight,-1);
+//                                            glPushAttrib(GL_POLYGON_BIT);
+//                                            glFrontFace(GL_CW);
+//                                            glPointSize(2.5f);
+//                                            mesh.drawDisplayList(GL_POINTS);
+//                                            glPopAttrib();
+//                                        glPopMatrix();
+//                                        glPushMatrix();
+//                                            glScalef(_isoPlaneWidth,_isoPlaneHeight,-1);
+//                                            glPushAttrib(GL_POLYGON_BIT);
+//                                                glFrontFace(GL_CW);
+//                                                glPolygonMode(GL_FRONT, GL_LINE);
+//                                                glPolygonMode(GL_BACK, GL_LINE);
+//                                                mesh.drawDisplayList(GL_LINES);
+//                                            glPopAttrib();
+//                                        glPopMatrix();
+//                                    glPopMatrix();
 
-                ofPopMatrix(); //visual
-                shader.end();
+//                ofPopMatrix(); //visual
+//                shader.end();
 
                 ofPushMatrix();
                     ofScale(1,1,-1);
                     microManager.draw();
+                    imgSourceVideo.draw(-500,-375, 1000, 750);
                 ofPopMatrix();
 
 
