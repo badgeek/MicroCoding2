@@ -4,6 +4,7 @@
 #include "ofMain.h"
 #include "eyeMesh.h"
 #include "ofxGLWarper.h"
+#include "ofxSyphon.h"
 
 #include "microinspector.h"
 #include "microinspectormanager.h"
@@ -15,7 +16,7 @@ public:
     isoMetricPlane();
     ~isoMetricPlane();
 
-    void setup(ofVideoGrabber * _video);
+    void setup(ofVideoGrabber * _video, ofBaseApp *_app);
     void update();
     void draw();
 
@@ -24,8 +25,8 @@ public:
     void updateCorner();
     void updateScreenToSourceCoord();
 
-    ofPoint getIsoToScreenCoord(const ofVec4f &_srcpos);
-    ofPoint getIsoToScreenCoord(const ofPoint &_srcpos);
+    ofPoint getIsoToWindowCoord(const ofVec4f &_srcpos);
+    ofPoint getIsoToWindowCoord(const ofPoint &_srcpos);
     ofPoint getScreenToSourceCoord(const ofPoint &_srcpos);
 
     void enableMouseEvents();
@@ -42,9 +43,15 @@ public:
     void _keyPressed(ofKeyEventArgs &e);
     void _keyReleased(ofKeyEventArgs &e);
 
+    void audioIn(float * input, int bufferSize, int nChannels);
+
+
     void drawDepthMap();
     void drawIsoMetric();
     void drawDeptMapCamera();
+
+    float zDepth;
+
 private:
     ofxGLWarper warp;
     eyeMesh mesh;
@@ -84,6 +91,10 @@ private:
     ofFbo buffFbo;
 
     int scene;
+
+    ofxSyphonClient mClient;
+
+
 
 };
 

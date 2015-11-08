@@ -7,7 +7,10 @@ class microInspector
 {
 public:
     microInspector();
+
     void draw();
+    void drawLabel();
+
     void setPos(float _x, float _y);
     void setup(ofImage * _video, ofRectangle * _isoRect);
     void update();
@@ -35,20 +38,23 @@ public:
     virtual void onRelease(float x, float y, int button)  ;        // called when mouse releases while over object
     virtual void onReleaseOutside(float x, float y, int button) ;  // called when mouse releases outside of object after being pressed on object
 
-private:
-    ofRectangle *rectIsoPlane;
-    ofRectangle rectScreenCoord;
-    ofRectangle rectSourceCoord;
-
-    unsigned char savedVideo[1440000];
     float differenceVideo;
     float differenceVideo2;
 
+    float posx; //source coord [oF normal coordinate system]
+    float posy; //source coord [oF normal coordinate system]
+
+    ofRectangle *rectIsoPlane;
+    ofRectangle rectIsoCoord;
+    ofRectangle rectSourceCoord;
+
+private:
+
+
+    unsigned char savedVideo[1440000];
+
     float width;
     float height;
-
-    float posx;
-    float posy;
 
     float prevposx;
     float prevposy;

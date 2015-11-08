@@ -13,8 +13,8 @@
 
 isoMetricPlane::isoMetricPlane()
 {
-
     scene = 0;
+    zDepth = 0;
 }
 //--------------------------------------------------------------
 
@@ -24,7 +24,7 @@ isoMetricPlane::~isoMetricPlane() {
 }
 //--------------------------------------------------------------
 
-void isoMetricPlane::setup(ofVideoGrabber *_video)
+void isoMetricPlane::setup(ofVideoGrabber *_video, ofBaseApp * _app)
 {
     mesh.setMeshGrid(150,150);
     mesh.setMeshSize(0.0066,0.0066);
@@ -49,8 +49,6 @@ void isoMetricPlane::setup(ofVideoGrabber *_video)
 
     warp.setup(_isoPlaneWidth,_isoPlaneHeight); //isometric area - fromScreenToWarpCoord
 
-//    warp.toogleActive();
-//    warp.deactivate();
 
     updateOrtho();
     updateIsoToScreen();
@@ -66,11 +64,8 @@ void isoMetricPlane::setup(ofVideoGrabber *_video)
 
     microManager.setup(&mousepos_src);
 
-//    buffFbo.allocate(1024, 768, GL_RGBA);
-
-//    buffFbo.begin();
-//    ofClear(0);
-//    buffFbo.end();
+    mClient.setup();
+    mClient.set("","Syphoner Demo");
 
 }
 //--------------------------------------------------------------
@@ -95,7 +90,7 @@ void isoMetricPlane::update()
 void isoMetricPlane::drawDepthMap()
 {
     shader.begin();
-    shader.setUniform1f("eyeMultiply", 200.0f);
+    shader.setUniform1f("eyeMultiply", 200);
     shader.setUniformTexture("eyeTexDepth", webcam->getTextureReference(),0);
     ofPushMatrix(); //visual
         ofScale(1,1,1);
@@ -107,7 +102,7 @@ void isoMetricPlane::drawDepthMap()
                                 glScalef(_isoPlaneWidth,_isoPlaneHeight,-1);
                                 glPushAttrib(GL_POLYGON_BIT);
                                 glFrontFace(GL_CW);
-                                glPointSize(2.5f);
+                                glPointSize(4.5f);
                                 mesh.drawDisplayList(GL_POINTS);
                                 glPopAttrib();
                             glPopMatrix();
@@ -144,10 +139,9 @@ void isoMetricPlane::drawIsoMetric()
 
             glPushMatrix(); //2
 
-            //screen coord to isometric coord on screen
-            float _posxx = mousepos_src.x - _isoPlaneCenterX;
-            float _posyy = (mousepos_src.y - _isoPlaneCenterY) * -1.0f;
-
+            //source coord to isometric coord on screen
+            float _posxx =  mousepos_src.x - _isoPlaneCenterX;
+            float _posyy = -mousepos_src.y + _isoPlaneCenterY;
 
 
             ofLine(-2000, _posyy, 2000, _posyy);
@@ -176,13 +170,13 @@ void isoMetricPlane::drawIsoMetric()
 //                ofDrawGrid(isoGridWidth,5.0f,false,false,false,true);
 
                 ofPushStyle();
-                ofColor c;
-                c.set(50);
-                ofSetColor(c);
-                ofPushMatrix();
-                ofRotate(90, 0, 1, 0);
-                ofDrawGridPlane(isoGridWidth, 5.0f, false);
-                ofPopMatrix();
+                    ofColor c;
+                    c.set(50);
+                    ofSetColor(c);
+                    ofPushMatrix();
+                        ofRotate(90, 0, 1, 0);
+                        ofDrawGridPlane(isoGridWidth, 5.0f, false);
+                    ofPopMatrix();
                 ofPopStyle();
 
                 glPushMatrix();
@@ -212,11 +206,22 @@ void isoMetricPlane::drawIsoMetric()
         glMatrixMode(GL_MODELVIEW);
 
 
-//            ofPoint test1 = getIsoToScreenCoord(corner[0]);
+//        microInspector * _inspector;
+//        for(vector<microInspector>::iterator it = microManager.inspectors.begin(); it != microManager.inspectors.end(); it++){
+//            _inspector = &(*it);
+//           ofPoint _tmppos;
+//           _tmppos.set(_inspector->rectIsoCoord.getCenter().x,_inspector->rectIsoCoord.getCenter().y);
+//           _tmppos = getIsoToWindowCoord(_tmppos);
+////           ofDrawBitmapString("TEST", _tmppos.x + 50, _tmppos.y - 50);
+//           ofRect( _tmppos.x + 50, _tmppos.y - 150, 200, 100);
+//           ofLine(_tmppos.x, _tmppos.y,  _tmppos.x + 50, _tmppos.y - 100);
+//        }
+
+              //    microManager.drawLabel();
+//          ofPoint test1 = getIsoToScreenCoord(mousepos_src);
 //            ofPoint test2 = getIsoToScreenCoord(corner[1]);
 //            ofPoint test3 = getIsoToScreenCoord(corner[2]);
 //            ofPoint test4 = getIsoToScreenCoord(corner[3]);
-
 //            ofCircle(test1.x, test1.y, 10);
 //            ofCircle(test2.x, test2.y, 20);
 //            ofCircle(test3.x, test3.y, 30);
@@ -247,6 +252,7 @@ void isoMetricPlane::drawDeptMapCamera()
 
 
     camera.begin();
+    microManager.draw();
     drawDepthMap();
     camera.end();
 
@@ -273,6 +279,9 @@ void isoMetricPlane::draw()
         break;
     case 1:
         drawDeptMapCamera();
+        break;
+    case 2:
+        mClient.draw(ofGetWidth()/2 - mClient.getWidth()/2, ofGetHeight()/2 -  mClient.getHeight()/2);
         break;
     }
 
@@ -302,22 +311,23 @@ void isoMetricPlane::updateIsoToScreen()
     matmv.rotate(-90.0f, 1.0f, 0.0f, 0.0f);
     matmv.rotate(-45.0f, 0.0f, 1.0f, 0.0f);
     matmv.rotate(35.264f, 1.0f, 0.0f, 0.0f);
+
+    matprojected = matmv * matprojortho ;
 }
 //--------------------------------------------------------------
 
 void isoMetricPlane::updateCorner()
 {
-    warp.setCorner(warp.BOTTOM_LEFT, getIsoToScreenCoord(corner[0]) );
-    warp.setCorner(warp.TOP_LEFT, getIsoToScreenCoord(corner[1]) );
-    warp.setCorner(warp.TOP_RIGHT, getIsoToScreenCoord(corner[2]) );
-    warp.setCorner(warp.BOTTOM_RIGHT, getIsoToScreenCoord(corner[3]) );
+    warp.setCorner(warp.BOTTOM_LEFT, getIsoToWindowCoord(corner[0]) );
+    warp.setCorner(warp.TOP_LEFT, getIsoToWindowCoord(corner[1]) );
+    warp.setCorner(warp.TOP_RIGHT, getIsoToWindowCoord(corner[2]) );
+    warp.setCorner(warp.BOTTOM_RIGHT, getIsoToWindowCoord(corner[3]) );
 }
 //--------------------------------------------------------------
 
-ofPoint isoMetricPlane::getIsoToScreenCoord(const ofVec4f &_srcpos)
+ofPoint isoMetricPlane::getIsoToWindowCoord(const ofVec4f &_srcpos)
 {
-    matprojected = matmv * matprojortho ;
-    ofVec4f result 	 = _srcpos * matprojected ;
+    ofVec4f result = _srcpos * matprojected ;
     ofPoint coord;
     coord.set( ((float)ofGetWidth()/2.0f) + result.x * ofGetWidth()/2.0f  , (ofGetHeight()/2.0f) + result.y * ofGetHeight()/2.0f, result.z);
     return coord;
@@ -325,11 +335,11 @@ ofPoint isoMetricPlane::getIsoToScreenCoord(const ofVec4f &_srcpos)
 //--------------------------------------------------------------
 
 
-ofPoint isoMetricPlane::getIsoToScreenCoord(const ofPoint &_srcpos)
+ofPoint isoMetricPlane::getIsoToWindowCoord(const ofPoint &_srcpos)
 {
     ofVec4f pos;
     pos.set(_srcpos.x, _srcpos.y, _srcpos.z, 1);
-    return getIsoToScreenCoord(pos);
+    return getIsoToWindowCoord(pos);
 }
 
 //--------------------------------------------------------------
@@ -405,20 +415,23 @@ void isoMetricPlane::_mouseReleased(ofMouseEventArgs &e) {
 //--------------------------------------------------------------
 void isoMetricPlane::_keyPressed(ofKeyEventArgs &e) {
     int key = e.key;
-    microInspector _ins;
-
-//    float _posxx = mousepos_src.x - _isoPlaneCenterX;
-//    float _posyy = (mousepos_src.y - _isoPlaneCenterY) * -1.0f;
-//    ofLog() << "posx " << ofToString(_posxx)  << "posy " << ofToString(_posyy);
-
-    _ins.setup(&imgSourceVideo, &isoPlaneRect);
-    _ins.setPos(mousepos_src.x, mousepos_src.y);
 
 //    _ins.setPos(_posxx, _posyy);
 
-    if (key == 'a') microManager.inspectors.push_back(_ins);
+    if (key == 'a') {
+        microInspector _ins;
+        //    float _posxx = mousepos_src.x - _isoPlaneCenterX;
+        //    float _posyy = (mousepos_src.y - _isoPlaneCenterY) * -1.0f;
+        //    ofLog() << "posx " << ofToString(_posxx)  << "posy " << ofToString(_posyy);
+        _ins.setup(&imgSourceVideo, &isoPlaneRect);
+        _ins.setPos(mousepos_src.x, mousepos_src.y);
+        microManager.inspectors.push_back(_ins);
+    }
+
+
     if (key == 'z') scene = 0;
     if (key == 'x') scene = 1;
+    if (key == 'c') scene = 2;
 
 }
 

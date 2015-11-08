@@ -3,6 +3,7 @@
 microInspectorManager::microInspectorManager()
 {
     enableMouseEvents();
+    tmrOsc.setInterval(0.1);
 }
 
 microInspectorManager::~microInspectorManager()
@@ -23,13 +24,38 @@ void microInspectorManager::draw()
     }
 }
 
+void microInspectorManager::drawLabel()
+{
+    for(vector<microInspector>::iterator it = inspectors.begin(); it != inspectors.end(); it++){
+        (*it).drawLabel();
+    }
+}
+
 //--------------------------------------------------------------
+
+void microInspectorManager::updateOsc()
+{
+    if (tmrOsc.tick())
+    {
+        microInspector * _inspector;
+        for(vector<microInspector>::iterator it = inspectors.begin(); it != inspectors.end(); it++){
+            _inspector = &(*it);
+
+            ofLog() << "tick";
+
+        }
+    }
+}
 
 void microInspectorManager::update()
 {
     for(vector<microInspector>::iterator it = inspectors.begin(); it != inspectors.end(); it++){
         (*it).update();
     }
+
+//    updateOsc();
+
+
 }
 
 //--------------------------------------------------------------

@@ -136,6 +136,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		44EE3FC72C4648D9A19F8E89 /* ofxtiming.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxtiming.h; path = ofxtiming.h; sourceTree = "<group>"; };
 		00D6D32B84B099226431108C /* ofxOsc.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxOsc.h; path = ../../../addons/ofxOsc/src/ofxOsc.h; sourceTree = SOURCE_ROOT; };
 		011E372AEA4DFBC1A32C2851 /* all_indices.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = all_indices.h; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/all_indices.h; sourceTree = SOURCE_ROOT; };
 		01438542609FC64F1EC60EEB /* ofxKinectExtras.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxKinectExtras.cpp; path = ../../../addons/ofxKinect/src/extra/ofxKinectExtras.cpp; sourceTree = SOURCE_ROOT; };
@@ -1182,7 +1183,8 @@
 				10CD4D38E86E47AFBBFFCB9A /* microinspector.cpp */,
 				37D77D92BAA44CE5BCDC5020 /* microinspectormanager.h */,
 				D01DB3534B894F0EB4427759 /* microinspectormanager.cpp */,
-			);
+			    44EE3FC72C4648D9A19F8E89 /* ofxtiming.h */,
+);
 			path = src;
 			sourceTree = SOURCE_ROOT;
 		};

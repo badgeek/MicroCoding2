@@ -5,6 +5,12 @@
 #include "isometricplane.h"
 #include "ofxGui.h"
 #include "ofxSyphon.h"
+#include "ofxOsc.h"
+
+#include "ofxtiming.h"
+
+#define HOST "localhost"
+#define PORT 12345
 
 class ofApp : public ofBaseApp{
 
@@ -22,6 +28,7 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+        void audioIn(float * input, int bufferSize, int nChannels);
 
         ofxPanel gui;
 
@@ -30,5 +37,18 @@ private:
         ofVideoGrabber * wew;
         ofTexture ps3;
         isoMetricPlane isoplane;
-    ofxSyphonClient mClient;
+
+
+        ofSoundStream soundStream;
+
+        int 	bufferCounter;
+        int 	drawCounter;
+
+        float smoothedVol;
+        float scaledVol;
+
+        vector <float> left;
+        vector <float> right;
+        vector <float> volHistory;
+
 };

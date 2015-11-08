@@ -29,30 +29,36 @@ void microInspector::draw()
                 ofSetColor(0,255,0);
             }
             ofTranslate(0,0,10);
-            ofRect(rectScreenCoord);
+            ofRect(rectIsoCoord);
             //ofCircle(rectScreenCoord.getTopLeft().x, rectScreenCoord.getTopLeft().y, 10);
         ofPopStyle();
    ofPopMatrix();
   // ofDrawBitmapString("microInspector", rect.x, rect.y,10);
-    ofRect(rectScreenCoord);
+    ofRect(rectIsoCoord);
 
-    ofPushMatrix();
-        ofPushMatrix();
-            ofTranslate(rectScreenCoord.getCenter().x, rectScreenCoord.getCenter().y,40);
-            //croppedVideo.draw(0,0);
-//            sourceVideo->draw(0,0);
-    //   // ofCircle(0,0,10);
-            ofPushMatrix();
-                ofRotateX(-90);
-                ofPushMatrix();
-                ofRotateY(ofGetElapsedTimef()*40);
-                ofDrawBox(40);
-                ofPopMatrix();
-        //        ofDrawCone(0, 0, 10,50);
-            ofPopMatrix();
-        ofPopMatrix();
-    ofPopMatrix();
+//    ofPushMatrix();
+//        ofPushMatrix();
+//            ofTranslate(rectIsoCoord.getCenter().x, rectIsoCoord.getCenter().y,40);
+//            //croppedVideo.draw(0,0);
+////            sourceVideo->draw(0,0);
+//    //   // ofCircle(0,0,10);
+//            ofPushMatrix();
+//                ofRotateX(-90);
+//                ofPushMatrix();
+//                ofRotateY(ofGetElapsedTimef()*40);
+//                ofDrawBox(40);
+//                ofPopMatrix();
+//        //        ofDrawCone(0, 0, 10,50);
+//            ofPopMatrix();
+//        ofPopMatrix();
+//    ofPopMatrix();
 
+}
+//--------------------------------------------------------------
+
+void microInspector::drawLabel()
+{
+    ofDrawBitmapString("Test", posx, posy, 0);
 }
 //--------------------------------------------------------------
 
@@ -64,10 +70,10 @@ void microInspector::setPos(float _x, float _y)
    _isoPlaneCenterX = rectIsoPlane->getCenter().x;
    _isoPlaneCenterY = rectIsoPlane->getCenter().y;
 
-   float _tx = _x - _isoPlaneCenterX;
-   float _ty = (_y  - _isoPlaneCenterY) * -1.0f;
+   float _tx = _x - _isoPlaneCenterX;               // move oF coordinate system to 0,0 as center point
+   float _ty = (-_y)  + _isoPlaneCenterY;    // move oF coordinate system to 0,0 as center point
 
-   rectScreenCoord.setFromCenter(_tx, _ty, width, height);
+   rectIsoCoord.setFromCenter(_tx, _ty, width, height);
    rectSourceCoord.setFromCenter(_x,_y,    width, height);
    //rect.setFromCenter(posx, posy, width, height);
    ofLog() << rectSourceCoord.getCenter().x;
@@ -110,7 +116,7 @@ void microInspector::update()
 
         diffFrame();
 
-        ofLog() << differenceVideo;
+      //  ofLog() << differenceVideo;
 }
 
 float microInspector::getScreenPosX()

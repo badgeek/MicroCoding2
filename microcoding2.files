@@ -10,3 +10,4 @@ src/microinspectormanager.h
 src/microinspectormanager.cpp
 src/microinspector.h
 src/microinspector.cpp
+src/ofxtiming.h

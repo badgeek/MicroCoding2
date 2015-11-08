@@ -41,5 +41,6 @@
 ../../../addons/ofxFx/src
 ../../../addons/ofxGLWarper/src
 ../../../addons/ofxPS3EyeGrabber/src
+../../../addons/ofxSyphon/src
 src
 .
